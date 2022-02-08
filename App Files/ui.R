@@ -119,8 +119,10 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 
 				 		tabsetPanel(type = "tabs",
 				 								tabPanel("Full Time Series",
-				 												 plotOutput("plot.full.series",width = "100%", height = "600px"))
-
+				 												 plotOutput("plot.full.series",width = "100%", height = "600px")),
+				 								tabPanel("Fitted Trend"),
+				 								tabPanel("Probability of Decline"),
+				 								tabPanel("MCMC Diagnostics")
 
 
 
