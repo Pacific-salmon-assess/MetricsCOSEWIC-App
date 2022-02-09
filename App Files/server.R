@@ -167,7 +167,9 @@ jags.fit <- reactive({
 																 perc.change.bm = input$prob.decl.bm,
 																 out.type = "short",
 																 mcmc.plots = FALSE,
-																 convergence.check = FALSE# ??Conv check crashes on ts() ???
+																 convergence.check = FALSE, # ??Conv check crashes on ts() ???,
+																 priors = NULL,
+																 mcmc.settings = list(n.chains = input$n.chains, n.iter = input$n.iter, n.burnin = input$n.burnin, n.thin = input$n.thin)
 																	)
 
 	print("finished jags")
@@ -222,7 +224,7 @@ output$plot.full.series<- renderPlot({
 		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
 		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
 	title(main = input$abd.label,col.main = "darkblue")
-	abline(v = c(input$endyr-input$time.window +1,input$endyr),col="red",lty=2)
+	abline(v = c(input$endyr-input$time.window +1,input$endyr),col="red",lty=2,lwd=5)
 
 })
 
