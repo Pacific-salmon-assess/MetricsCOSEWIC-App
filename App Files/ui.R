@@ -134,6 +134,10 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 				 											 choices=c("log","Bayesian")   ,
 				 											 selected = c("log") , inline = TRUE),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
+				 		uiOutput("priors.p.intercept"),
+				 		uiOutput("priors.tau.intercept"),
+				 		uiOutput("priors.p.slope"),
+				 		uiOutput("priors.tau.slope")
 
 				 	) # end sidebar
 				 	,

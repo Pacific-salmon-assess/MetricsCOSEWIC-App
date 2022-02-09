@@ -1,5 +1,4 @@
 
-# INSERT PASSWORD STEP (CHECK WITH JOHN SON)
 
 
 function(input, output, session) {
@@ -107,6 +106,25 @@ data.forfit <- reactive({
 })
 
 
+priors.default <- reactive({
+
+	data.in <- data.forfit()
+
+	yrs.use <- 0:(length(data.in$Abd)-1)
+
+	priors.list = list( p_intercept = median(data.in$Abd,na.rm=TRUE),
+								 tau_intercept = (1/ max(data.in$Abd,na.rm=TRUE))^2 ,
+								 p_slope = 0,
+								 tau_slope =  (1 / ( max(data.in$Abd,na.rm=TRUE)/ max(yrs.use) ))^2
+									)
+
+	print(priors.list)
+	return(priors.list)
+
+})
+
+
+
 
 
 	#------------------------------------------
@@ -134,6 +152,19 @@ output$endyr.slider <- renderUI({
 })
 
 
+output$priors.p.intercept <- renderUI({
+	numericInput("prior.p.intercept", label = "p.intercept", value = priors.default()["p_intercept"] )
+})
+
+output$priors.tau.intercept <- renderUI({
+	numericInput("prior.tau.intercept", label = "tau.intercept", value = priors.default()["tau_intercept"] )
+})
+output$priors.p.slope <- renderUI({
+	numericInput("prior.p.slope", label = "p.slope", value = priors.default()["p_slope"] )
+})
+output$priors.tau.slope <- renderUI({
+	numericInput("prior.tau.slope", label = "tau.slope", value = priors.default()["tau_slope"] )
+})
 
 
 #------------------------------------------
@@ -168,7 +199,11 @@ jags.fit <- reactive({
 																 out.type = "short",
 																 mcmc.plots = FALSE,
 																 convergence.check = FALSE, # ??Conv check crashes on ts() ???,
-																 priors = NULL,
+																 priors = list(p_intercept = input$prior.p.intercept,
+																 							 tau_intercept = input$prior.tau.intercept,
+																 							 p_slope = input$prior.p.slope,
+																 							 tau_slope =  input$prior.tau.slope
+																 							 ),
 																 mcmc.settings = list(n.chains = input$n.chains, n.iter = input$n.iter, n.burnin = input$n.burnin, n.thin = input$n.thin)
 																	)
 
