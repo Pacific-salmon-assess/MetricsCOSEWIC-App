@@ -182,7 +182,25 @@ return(est.jags)
 
 
 
+#------------------------------------------
+# TABLES
+#------------------------------------------
 
+
+mcmc.table.src <- reactive({
+	jags.fit.in <- jags.fit()
+	table.df <- jags.fit.in$summary %>% as.data.frame %>% #mutate_if(is.numeric,function(x){round(x,5)}) %>% t() %>% as.data.frame()
+								mutate(Rhat = round(Rhat,4)) %>% select(Rhat, n.eff,everything())
+	return(table.df)
+})
+
+
+output$table.mcmc <- DT::renderDataTable(
+	DT::datatable(mcmc.table.src(), extensions = 'Buttons',
+								options = list(paging = FALSE ,
+															 dom = 'Bfrtip',	buttons =  list(
+															 	list(extend = 'csv', filename = "MCMCSummary"))))
+)
 
 
 

@@ -86,7 +86,14 @@ pageWithSidebar(
 #######
 tabPanel("General Settings", value= "general.settings",
 
-				 tags$h4("Any overarching settings we want to put here?"),
+				 tags$h4("Moved this here, because the explore tab was getting crowded..."),
+				 tags$hr(style = "border-top: 1px solid #000000;"),
+				 numericInput("abd.rescale", "Scale for Abundance", value=1),
+				 textInput("abd.label", "Abd Label", value = "Abundance", width = "80%"),
+				 tags$hr(style = "border-top: 1px solid #000000;"),
+				 numericInput("prob.decl.bm", "Prob Decl BM", value= -25, min = -90, max=0,step = 1),
+
+
 
 				 #tags$h4("Data Treatment Settings"),
 				 #	checkboxInput("cov.rescale", label="SibReg Complex: Rescale Covariates?", value = TRUE ),
@@ -112,12 +119,7 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 
 				 	sidebarPanel(
 				 		add_busy_spinner(spin = "fading-circle"),
-				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		uiOutput("du.list.menu"),
-				 		numericInput("abd.rescale", "Scale for Abundance", value=1),
-				 		textInput("abd.label", "Abd Label", value = "Abundance", width = "80%"),
-				 		tags$hr(style = "border-top: 1px solid #000000;"),
-				 		numericInput("prob.decl.bm", "Prob Decl BM", value= -25, min = -90, max=0,step = 1),
 				 		uiOutput("time.window.slider"),
 				 		uiOutput("endyr.slider"),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
@@ -137,8 +139,10 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 				 												 plotOutput("plot.full.series",width = "100%", height = "600px")),
 				 								tabPanel("Fitted Trend",
 				 												 plotOutput("plot.fit",width = "100%", height = "600px")),
-				 								tabPanel("Summary"),
-				 								tabPanel("MCMC Diagnostics")
+				 								#conditionalPanel(condition = "'Bayesian' %in% input['fit.settings']",
+				 								tabPanel("Summary", DT::dataTableOutput("table.mcmc")), #),
+				 								#conditionalPanel(condition = "'Bayesian' %in% input['fit.settings']",
+				 								tabPanel("MCMC Diagnostics")#) # end conditional panel
 
 
 
