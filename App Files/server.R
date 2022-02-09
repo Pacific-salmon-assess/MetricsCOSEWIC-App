@@ -164,10 +164,12 @@ jags.fit <- reactive({
 	est.jags <- calcPercChangeMCMC(vec.in = data.in$Abd,
 																 method = "jags",
 																 model.in = NULL, # this defaults to the BUGS code in the built in function trend.bugs.1()
-																 perc.change.bm = -25,
+																 perc.change.bm = input$prob.decl.bm,
 																 out.type = "short",
 																 mcmc.plots = FALSE,
-																 convergence.check = FALSE# ??Conv check crashes on ts() ???
+																 convergence.check = FALSE, # ??Conv check crashes on ts() ???,
+																 priors = NULL,
+																 mcmc.settings = list(n.chains = input$n.chains, n.iter = input$n.iter, n.burnin = input$n.burnin, n.thin = input$n.thin)
 																	)
 
 	print("finished jags")
@@ -182,7 +184,25 @@ return(est.jags)
 
 
 
+#------------------------------------------
+# TABLES
+#------------------------------------------
 
+
+mcmc.table.src <- reactive({
+	jags.fit.in <- jags.fit()
+	table.df <- jags.fit.in$summary %>% as.data.frame %>% #mutate_if(is.numeric,function(x){round(x,5)}) %>% t() %>% as.data.frame()
+								mutate(Rhat = round(Rhat,4)) %>% select(Rhat, n.eff,everything())
+	return(table.df)
+})
+
+
+output$table.mcmc <- DT::renderDataTable(
+	DT::datatable(mcmc.table.src(), extensions = 'Buttons',
+								options = list(paging = FALSE ,
+															 dom = 'Bfrtip',	buttons =  list(
+															 	list(extend = 'csv', filename = "MCMCSummary"))))
+)
 
 
 
@@ -204,7 +224,7 @@ output$plot.full.series<- renderPlot({
 		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
 		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
 	title(main = input$abd.label,col.main = "darkblue")
-	abline(v = c(input$endyr-input$time.window +1,input$endyr),col="red",lty=2)
+	abline(v = c(input$endyr-input$time.window +1,input$endyr),col="red",lty=2,lwd=5)
 
 })
 
