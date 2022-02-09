@@ -14,6 +14,7 @@ library("shinydashboard")
 library("shinyjqui")
 library("shinyFiles")
 library("shinybusy")
+library("MetricsCOSEWIC")
 
 
 
@@ -104,11 +105,17 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 
 				 	sidebarPanel(
 				 		add_busy_spinner(spin = "fading-circle"),
+				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		uiOutput("du.list.menu"),
 				 		numericInput("abd.rescale", "Scalar", value=1),
 				 		textInput("abd.label", "Abd Label", value = "Abundance", width = "80%"),
+				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		uiOutput("time.window.slider"),
-				 		uiOutput("endyr.slider")
+				 		uiOutput("endyr.slider"),
+				 		tags$hr(style = "border-top: 1px solid #000000;"),
+				 		checkboxGroupInput("fit.settings", label="Fit Settings",
+				 											 choices=c("log","Bayesian")   ,
+				 											 selected = c("log") , inline = TRUE)
 
 				 	) # end sidebar
 				 	,
@@ -120,8 +127,9 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 				 		tabsetPanel(type = "tabs",
 				 								tabPanel("Full Time Series",
 				 												 plotOutput("plot.full.series",width = "100%", height = "600px")),
-				 								tabPanel("Fitted Trend"),
-				 								tabPanel("Probability of Decline"),
+				 								tabPanel("Fitted Trend",
+				 												 plotOutput("plot.fit",width = "100%", height = "600px")),
+				 								tabPanel("Summary"),
 				 								tabPanel("MCMC Diagnostics")
 
 

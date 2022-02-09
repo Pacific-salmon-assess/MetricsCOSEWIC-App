@@ -36,7 +36,7 @@ library("purrr")
 library("tidyr")
 library("tibble")
 library("readr")
-
+library("MetricsCOSEWIC")
 
 
 
@@ -91,6 +91,22 @@ data.selected <- reactive({
 	})
 
 
+data.forfit <- reactive({
+
+	settings.sub <- fit.settings.use()
+	data.sub <- 	data.selected()
+	print(settings.sub)
+	data.sub <- data.sub %>% dplyr::filter(Year >= input$endyr-input$time.window +1, Year <= input$endyr)
+
+	print(data.sub)
+	if("log" %in% settings.sub){data.sub$Abd <- log(data.sub$Abd)}
+	print(data.sub)
+
+	return(data.sub)
+
+})
+
+
 
 
 	#------------------------------------------
@@ -111,10 +127,61 @@ output$time.window.slider <- renderUI({
 })
 
 output$endyr.slider <- renderUI({
-	data.use <- data.selected ()
+	data.use <- data.selected()
 	yr.range <- range(data.use$Year,na.rm=TRUE)
-	sliderInput("endyr", "Select and End Year", min = yr.range[1]+input$time.window-1, max = yr.range[2], value = yr.range[2],animate=FALSE,sep="")
+	sliderInput("endyr", "Select and End Year", min = yr.range[1]+input$time.window-1,
+							max = yr.range[2], value = yr.range[2],animate=animationOptions(interval = 1500),sep="")
 })
+
+
+
+
+#------------------------------------------
+# FIT SETTINGS AND FITS
+#------------------------------------------
+
+
+fit.settings.use <- reactive({input$fit.settings})
+
+
+det.fit <- reactive({
+	data.in <- data.forfit()
+	est.simple <- calcPercChangeSimple(data.in$Abd)
+return(est.simple)
+
+})
+
+
+
+
+jags.fit <- reactive({
+
+	data.in <- data.forfit()
+
+	print("starting jags")
+  print(data.in)
+  print("----")
+	est.jags <- calcPercChangeMCMC(vec.in = data.in$Abd,
+																 method = "jags",
+																 model.in = NULL, # this defaults to the BUGS code in the built in function trend.bugs.1()
+																 perc.change.bm = -25,
+																 out.type = "short",
+																 mcmc.plots = FALSE,
+																 convergence.check = FALSE# ??Conv check crashes on ts() ???
+																	)
+
+	print("finished jags")
+
+return(est.jags)
+
+
+
+
+})
+
+
+
+
 
 
 
@@ -143,10 +210,73 @@ output$plot.full.series<- renderPlot({
 
 
 
+output$plot.fit<- renderPlot({
+
+	data.file.tmp <- data.forfit()
+	det.fit.in <- det.fit()
+	settings.sub <- fit.settings.use()
+
+	legend.labels <- paste0("Det: pChange = ", round(det.fit.in$pchange,1),"%")
+
+		if("Bayesian" %in% settings.sub){
+
+			jags.fit.in <- jags.fit()
+
+			jags.coeff <- list(intercept = jags.fit.in$summary["intercept","50%"],
+									 slope = jags.fit.in$summary["slope","50%"])
+
+			#est.jags$pchange
+			#est.jags$probdecl
+			#est.jags$summary
+			#est.jags$slope.converged
+			#est.jags$samples
+
+			legend.labels <- c(legend.labels,paste0("Bayes: Med(pChange) = ", round(jags.fit.in$pchange,1),
+																							"%; Prob Decl =",round(jags.fit.in$probdecl,1),"%")
+													)
+
+		} # end if BAyes
+
+
+	if(!("Bayesian" %in% settings.sub)){ jags.coeff<- list(intercept = NA,slope=NA) }
 
 
 
 
+
+	plotPattern(
+		yrs = data.file.tmp$Year ,
+		vals = data.file.tmp$Abd,
+		width = 1, 		color = "darkblue",
+		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
+		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
+	title(main = input$abd.label,col.main = "darkblue")
+
+
+  addFit(data.df = data.file.tmp,
+  			 coeff = det.fit.in ,
+  			 col = "red",lwd = 4,lty=3)
+
+  if("Bayesian" %in% settings.sub){
+  	addFit(data.df = data.file.tmp,
+  				 coeff = jags.coeff ,
+  				 col = "red",lwd = 4,lty=1)
+  }
+
+
+
+ legend("top", legend = legend.labels, col="red", lwd=4,lty= c(3,1),bty="n" , cex=1.3)
+
+
+})
+
+
+
+
+
+#------------------------------------------
+# REST IS OLD STUFF - KEEPING AROUND TO LOOK UP THINGS
+#------------------------------------------
 
 
 
@@ -975,7 +1105,7 @@ output$axis.label.sel <- renderUI({
 
 
 
-		compare.rankingpm <- reactive({input$compare.pm})
+
 
 
 		compare.retropm.array<- reactive({
