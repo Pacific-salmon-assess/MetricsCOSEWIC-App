@@ -1,4 +1,11 @@
 
+#install.packages("devtools") # Install the devtools package
+#library(devtools) # Load the devtools package.
+#install_github("SOLV-Code/MetricsCOSEWIC", dependencies = TRUE, build_vignettes = FALSE)
+#library(MetricsCOSEWIC)
+
+
+
 
 # Think it needs these here for the server deployment
 # shiny deployment looks for library(), so need that too in order to get the dependencies)
@@ -107,9 +114,10 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 				 		add_busy_spinner(spin = "fading-circle"),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		uiOutput("du.list.menu"),
-				 		numericInput("abd.rescale", "Scalar", value=1),
+				 		numericInput("abd.rescale", "Scale for Abundance", value=1),
 				 		textInput("abd.label", "Abd Label", value = "Abundance", width = "80%"),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
+				 		numericInput("prob.decl.bm", "Prob Decl BM", value= -25, min = -90, max=0,step = 1),
 				 		uiOutput("time.window.slider"),
 				 		uiOutput("endyr.slider"),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),

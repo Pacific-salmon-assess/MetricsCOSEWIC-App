@@ -164,7 +164,7 @@ jags.fit <- reactive({
 	est.jags <- calcPercChangeMCMC(vec.in = data.in$Abd,
 																 method = "jags",
 																 model.in = NULL, # this defaults to the BUGS code in the built in function trend.bugs.1()
-																 perc.change.bm = -25,
+																 perc.change.bm = input$prob.decl.bm,
 																 out.type = "short",
 																 mcmc.plots = FALSE,
 																 convergence.check = FALSE# ??Conv check crashes on ts() ???
