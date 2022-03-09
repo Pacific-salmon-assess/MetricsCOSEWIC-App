@@ -118,20 +118,21 @@ tabPanel("General Settings", value= "general.settings",
 ####################################
 
 
-tabPanel("Explore Annual Estimates", value= "probdecl",
+tabPanel("Decline Estimates", value= "probdecl",
 
 
 				 pageWithSidebar(
-				 	headerPanel("Explore Annual Estimates"),
+				 	headerPanel("Decline Estimates"),
 
 				 	sidebarPanel(
 				 		add_busy_spinner(spin = "fading-circle"),
 				 		uiOutput("du.list.menu"),
-				 		uiOutput("time.window.slider"),
+				 		uiOutput("time.window.slider1"),
+				 		uiOutput("time.window.slider2"),
 				 		uiOutput("endyr.slider"),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		checkboxGroupInput("fit.settings", label="Fit Settings",
-				 											 choices=c("log","Bayesian")   ,
+				 											 choices=c("Fit to ln(Abundance)?" = "log","Use Bayesian MCMC?" = "Bayesian")   ,
 				 											 selected = c("log") , inline = TRUE),
 				 		tags$hr(style = "border-top: 1px solid #000000;"),
 				 		uiOutput("priors.p.intercept"),
@@ -173,28 +174,16 @@ tabPanel("Explore Annual Estimates", value= "probdecl",
 
 
 
-tabPanel("Run Retrospective Test", value= "retrospective",
-
-
-				 pageWithSidebar(
-				 	headerPanel("Retrospective"),
-
-				 	sidebarPanel(
-
-				 	) # end sidebar
-				 	,
-
-
-				 	mainPanel(
-
-
-				 	) # end main panel
-
-				 ) #end page with side bar for model pre-check
-
-
-
-),
+#tabPanel("Run Retrospective Test", value= "retrospective",
+#				 pageWithSidebar(
+#				 	headerPanel("Retrospective"),
+#				 	sidebarPanel(
+#				 	) # end sidebar
+#				 	,
+#				 	mainPanel(
+#				 	) # end main panel
+#				 ) #end page with side bar for model pre-check
+#),
 
 ####################################
 

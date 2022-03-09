@@ -95,7 +95,7 @@ data.forfit <- reactive({
 	settings.sub <- fit.settings.use()
 	data.sub <- 	data.selected()
 	print(settings.sub)
-	data.sub <- data.sub %>% dplyr::filter(Year >= input$endyr-input$time.window +1, Year <= input$endyr)
+	data.sub <- data.sub %>% dplyr::filter(Year >= input$endyr-(input$avg.gen *input$num.gen) +1, Year <= input$endyr)
 
 	print(data.sub)
 	if("log" %in% settings.sub){data.sub$Abd <- log(data.sub$Abd)}
@@ -140,14 +140,20 @@ output$du.list.menu <- renderUI({
 	})
 
 
-output$time.window.slider <- renderUI({
-	sliderInput("time.window", "Select a Time Window", min = 5, max = 50, value = 15,animate=FALSE)
+output$time.window.slider1 <- renderUI({
+	sliderInput("avg.gen", "Avg Gen for DU", min = 2, max = 50, value = 5,animate=FALSE)
 })
+output$time.window.slider2 <- renderUI({
+	sliderInput("num.gen", "Num Gen for Decl Metric", min = 2, max = 20, value = 3,animate=FALSE)
+})
+
+
+
 
 output$endyr.slider <- renderUI({
 	data.use <- data.selected()
 	yr.range <- range(data.use$Year,na.rm=TRUE)
-	sliderInput("endyr", "Select and End Year", min = yr.range[1]+input$time.window-1,
+	sliderInput("endyr", "Select an End Year", min = yr.range[1]+(input$avg.gen *input$num.gen)-1,
 							max = yr.range[2], value = yr.range[2],animate=animationOptions(interval = 1500),sep="")
 })
 
@@ -259,7 +265,7 @@ output$plot.full.series<- renderPlot({
 		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
 		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
 	title(main = input$abd.label,col.main = "darkblue")
-	abline(v = c(input$endyr-input$time.window +1,input$endyr),col="red",lty=2,lwd=5)
+	abline(v = c(input$endyr-(input$avg.gen *input$num.gen) +1,input$endyr),col="red",lty=2,lwd=5)
 
 })
 
