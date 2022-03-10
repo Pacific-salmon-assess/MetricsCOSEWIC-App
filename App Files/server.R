@@ -201,8 +201,8 @@ jags.fit <- reactive({
 	est.jags <- calcPercChangeMCMC(vec.in = data.in$Abd,
 																 method = "jags",
 																 model.in = NULL, # this defaults to the BUGS code in the built in function trend.bugs.1()
-																 perc.change.bm = input$prob.decl.bm,
-																 out.type = "short",
+																 perc.change.bm = c(input$prob.decl.bm1,input$prob.decl.bm2,input$prob.decl.bm3),
+																 out.type = "long",
 																 mcmc.plots = FALSE,
 																 convergence.check = FALSE, # ??Conv check crashes on ts() ???,
 																 priors = list(p_intercept = input$prior.p.intercept,
@@ -247,6 +247,28 @@ output$table.mcmc <- DT::renderDataTable(
 
 
 
+prob.decl.table.src <- reactive({
+	jags.fit.in <- jags.fit()
+	table.df <- jags.fit.in$probdecl %>% as.data.frame %>% mutate(ProbDecl = round(ProbDecl,2))
+	return(table.df)
+})
+
+
+output$table.prob.decl<- DT::renderDataTable(
+	DT::datatable(prob.decl.table.src(), extensions = 'Buttons',
+								options = list(paging = FALSE ,
+															 dom = 'Bfrtip',	buttons =  list(
+															 	list(extend = 'csv', filename = "ProbDeclSummary"))))
+)
+
+
+
+
+
+
+
+
+
 
 #------------------------------------------
 # PLOTS
@@ -263,9 +285,10 @@ output$plot.full.series<- renderPlot({
 		vals = data.file.tmp$Abd,
 		width = 1, 		color = "darkblue",
 		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
-		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
+		hgrid = TRUE, vgrid = FALSE, vlines = c(input$endyr-(input$avg.gen *input$num.gen) +1,input$endyr),
+		pch.val = 21, pch.bg = "lightblue",pch.cex=1.3	)
 	title(main = input$abd.label,col.main = "darkblue")
-	abline(v = c(input$endyr-(input$avg.gen *input$num.gen) +1,input$endyr),col="red",lty=2,lwd=5)
+	#abline(v = c(input$endyr-(input$avg.gen *input$num.gen) +1,input$endyr),col="red",lty=2,lwd=5)
 
 })
 
@@ -293,7 +316,7 @@ output$plot.fit<- renderPlot({
 			#est.jags$samples
 
 			legend.labels <- c(legend.labels,paste0("Bayes: Med(pChange) = ", round(jags.fit.in$pchange,1),
-																							"%; Prob Decl =",round(jags.fit.in$probdecl,1),"%")
+																							"%")#; Prob Decl =") #,round(jags.fit.in$probdecl[1,],1),"%")
 													)
 
 		} # end if BAyes
@@ -310,7 +333,8 @@ output$plot.fit<- renderPlot({
 		vals = data.file.tmp$Abd,
 		width = 1, 		color = "darkblue",
 		yrs.axis = TRUE, vals.axis = TRUE, vals.lim = NULL,
-		hgrid = TRUE, vgrid = FALSE, pch.val = 21, pch.bg = "lightblue"	)
+		hgrid = TRUE, vgrid = FALSE,  vlines = c(input$endyr-(input$avg.gen *input$num.gen) +1,input$endyr),
+		pch.val = 21, pch.bg = "lightblue",pch.cex=1.3	)
 	title(main = input$abd.label,col.main = "darkblue")
 
 
@@ -332,6 +356,76 @@ output$plot.fit<- renderPlot({
 })
 
 
+
+
+
+
+output$plot.distr<- renderPlot({
+
+	settings.sub <- fit.settings.use()
+
+	if("Bayesian" %in% settings.sub){
+
+		jags.fit.in <- jags.fit()
+		est.simple <- det.fit()
+
+		plotDistribution(
+			x.lab = "Perc Change",
+			samples = list(Bayesian = jags.fit.in$samples$Perc_Change ),
+			det.est = est.simple$pchange,
+			plot.range = c(-90,90) #NULL #c(-90,90)
+		)
+
+	} # end if BAyes
+
+
+	if(!("Bayesian" %in% settings.sub)){
+
+
+		plot(1:5,1:5,type="n",axes=FALSE, xlab="",ylab="")
+		text(2.5,2.5,"Only for Bayesian Estimates")
+
+
+		}
+
+})
+
+
+
+
+
+output$plot.box<- renderPlot({
+
+	settings.sub <- fit.settings.use()
+
+	if("Bayesian" %in% settings.sub){
+
+		jags.fit.in <- jags.fit()
+		est.simple <- det.fit()
+
+
+		percchange.df <- data.frame(
+			MLE = c(NA,NA,est.simple$pchange,NA, NA),
+			Jags = quantile(jags.fit.in$samples$Perc_Change,probs = c(0.025,0.25,0.5,0.75,0.975)) )
+
+		plotBoxes(box.df = percchange.df %>% dplyr::rename(Bayesian = Jags), y.lab  = "Perc Change",   det.est = est.simple$pchange, plot.range = NULL)
+		#title(main = du.label, outer=TRUE,line=-2,col.main = "darkblue",cex.main=1.7)
+
+
+	} # end if BAyes
+
+
+	if(!("Bayesian" %in% settings.sub)){
+
+
+		plot(1:5,1:5,type="n",axes=FALSE, xlab="",ylab="")
+		text(2.5,2.5,"Only for Bayesian Estimates")
+
+
+
+	}
+
+})
 
 
 
