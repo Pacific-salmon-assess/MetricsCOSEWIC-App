@@ -93,7 +93,9 @@ tabPanel("General Settings", value= "general.settings",
 				 textInput("abd.label", "Abd Label", value = "Abundance"),
 				 tags$hr(style = "border-top: 1px solid #000000;"),
 				 tags$h4("BM and Metric Settings"),
-				 numericInput("prob.decl.bm", "Prob Decl BM", value= -25, min = -90, max=0,step = 1),
+				 numericInput("prob.decl.bm1", "Prob Decl BM 1", value= -30, min = -90, max=0,step = 1),
+				 numericInput("prob.decl.bm2", "Prob Decl BM 2", value= -50, min = -90, max=0,step = 1),
+				 numericInput("prob.decl.bm3", "Prob Decl BM 3", value= -70, min = -90, max=0,step = 1),
 				 tags$hr(style = "border-top: 1px solid #000000;"),
 				 tags$h4("MCMC Settings"),
 				 numericInput("n.chains", "Number of Chains", value=3),
@@ -153,11 +155,14 @@ tabPanel("Decline Estimates", value= "probdecl",
 				 								tabPanel("Fitted Trend",
 				 												 plotOutput("plot.fit",width = "100%", height = "600px")),
 				 								#conditionalPanel(condition = "'Bayesian' %in% input['fit.settings']",
-				 								tabPanel("Summary", DT::dataTableOutput("table.mcmc")), #),
-				 								#conditionalPanel(condition = "'Bayesian' %in% input['fit.settings']",
-				 								tabPanel("MCMC Diagnostics")#) # end conditional panel
-
-
+				 								tabPanel("Prob Decl Distr",
+				 												 plotOutput("plot.distr",width = "100%", height = "600px")),
+				 								tabPanel("Prob Decl Box",
+				 												 plotOutput("plot.box",width = "100%", height = "600px")),
+				 								tabPanel("Fit Summary", DT::dataTableOutput("table.mcmc")), #),
+				 								tabPanel("Prob Decl Summary", DT::dataTableOutput("table.prob.decl")) #, #),
+				 								#conditionalPanel(condition = "'Bayesian' %in% input['fit.settings']" #,
+				 								#tabPanel("MCMC Diagnostics")#) # end conditional panel
 
 				 		) # end tabsetpanel
 				 	) # end main panel
