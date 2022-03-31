@@ -214,7 +214,7 @@ fluidPage(
 
 fluidPage(
 
-  titlePanel("About ForecastR"),
+  titlePanel("About the MetricsCOSEWIC App"),
 
   fluidRow(
     column(8,
