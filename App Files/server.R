@@ -373,7 +373,7 @@ output$plot.distr<- renderPlot({
 			x.lab = "Perc Change",
 			samples = list(Bayesian = jags.fit.in$samples$Perc_Change ),
 			det.est = est.simple$pchange,
-			plot.range = c(-90,90) #NULL #c(-90,90)
+			plot.range = NULL #c(-90,90) #NULL #c(-90,90)
 		)
 
 	} # end if BAyes
