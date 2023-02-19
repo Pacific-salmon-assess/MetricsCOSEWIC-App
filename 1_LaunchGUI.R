@@ -19,7 +19,7 @@ source.modules("App Files/R/")
 
 
 # Load the function that does the model set-up and launches the GUI
-source("../LaunchFunction.R")
+source(here::here("LaunchFunction.R"))
 
 # testing the files
 #sink("test.txt")
